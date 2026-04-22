@@ -1,0 +1,21 @@
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx-logs:/var/log/nginx
+
+  syslog-generator:
+    image: alpine:latest
+    container_name: syslog-generator
+    restart: unless-stopped
+    command: sh -c "while true; do echo hello from edge; sleep 5; done"
+
+  test-app:
+    image: busybox:latest
+    container_name: test-app
+    restart: unless-stopped
+    command: sh -c "while true; do echo SAT Edge App Running; sleep 10; done"

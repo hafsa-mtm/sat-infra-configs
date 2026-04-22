@@ -1,0 +1,11 @@
+services:
+  metricbeat:
+    image: python:3.11-alpine
+    container_name: metricbeat
+    restart: unless-stopped
+    user: root
+    volumes:
+      - ./metrics.py:/metrics.py
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+    command: sh -c "apk add --no-cache py3-requests && python3 /metrics.py"
