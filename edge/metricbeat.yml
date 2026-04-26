@@ -1,0 +1,36 @@
+metricbeat.modules:
+  - module: system
+    metricsets:
+      - cpu
+      - memory
+      - network
+      - diskio
+      - filesystem
+      - process
+      - process_summary
+      - uptime
+      - load
+    enabled: true
+    period: 30s
+    processes: ['.*']
+
+  - module: docker
+    metricsets:
+      - container
+      - cpu
+      - diskio
+      - memory
+      - network
+    hosts: ["unix:///var/run/docker.sock"]
+    enabled: true
+    period: 30s
+
+output.elasticsearch:
+  hosts: ["http://192.168.87.132:9200"]
+  index: "metricbeat-%{+yyyy.MM.dd}"
+
+setup.ilm.enabled: false
+setup.template.name: "metricbeat"
+setup.template.pattern: "metricbeat-*"
+
+logging.level: info
