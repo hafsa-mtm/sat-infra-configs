@@ -5,7 +5,6 @@ filebeat.inputs:
     processors:
       - add_docker_metadata:
           host: "unix:///var/run/docker.sock"
-
   - type: log
     paths:
       - /var/log/syslog
@@ -14,8 +13,14 @@ filebeat.inputs:
       source: system
       host: edge
 
-output.logstash:
-  hosts: ["192.168.87.132:5044"]
+output.kafka:
+  hosts: ["192.168.87.132:9093"]
+  topic: "logs"
+  partition.round_robin:
+    reachable_only: false
+  required_acks: 1
+  compression: gzip
+  max_message_bytes: 1000000
 
 logging.level: info
 logging.to_files: true

@@ -25,12 +25,15 @@ metricbeat.modules:
     enabled: true
     period: 30s
 
-output.elasticsearch:
-  hosts: ["http://192.168.87.132:9200"]
-  index: "metricbeat-%{+yyyy.MM.dd}"
+output.kafka:
+  hosts: ["192.168.87.132:9093"]
+  topic: "metrics"
+  partition.round_robin:
+    reachable_only: false
+  required_acks: 1
+  compression: gzip
+  max_message_bytes: 1000000
 
-setup.ilm.enabled: false
-setup.template.name: "metricbeat"
-setup.template.pattern: "metricbeat-*"
+
 
 logging.level: info
