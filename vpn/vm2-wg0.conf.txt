@@ -1,0 +1,10 @@
+[Interface]
+# PrivateKey = <vm2_private_key>
+Address = 10.0.0.2/24
+ListenPort = 51820
+
+[Peer]
+PublicKey = qA0dYP/ifisllRsSTxk6JMpPNwfkCWcWwBdeF5iXDVw=
+AllowedIPs = 10.0.0.1/32
+Endpoint = 192.168.87.132:51820
+PersistentKeepalive = 25
