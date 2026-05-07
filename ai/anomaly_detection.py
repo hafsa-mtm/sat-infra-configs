@@ -7,7 +7,12 @@ from sklearn.preprocessing import StandardScaler
 from datetime import datetime, timezone, timedelta
 
 ES_HOST = "http://localhost:9200"
-
+ES_HEADERS = {
+    "Content-Type": "application/json",
+    "Authorization": "Basic ZWxhc3RpYzpzYXRfZWxhc3RpY18yMDI2"
+}
+ES_USER = "elastic"
+ES_PASS = "sat_elastic_2026"
 def fetch_metrics(size=1000):
     query = {
         "size": size,
@@ -28,7 +33,7 @@ def fetch_metrics(size=1000):
     req = urllib.request.Request(
         f"{ES_HOST}/.ds-metricbeat-*/_search",
         data=data,
-        headers={"Content-Type": "application/json"},
+        headers={"Content-Type": "application/json", "Authorization": "Basic ZWxhc3RpYzpzYXRfZWxhc3RpY18yMDI2"},
         method="POST"
     )
     try:
@@ -65,7 +70,7 @@ def enrich_with_multisource(df):
     try:
         req = urllib.request.Request(
             f"{ES_HOST}/logs-*/_count",
-            headers={"Content-Type": "application/json"},
+            headers=ES_HEADERS,
             data=json.dumps({"query": {"match_all": {}}}).encode(),
             method="POST"
         )
@@ -105,7 +110,7 @@ def enrich_with_multisource(df):
         req = urllib.request.Request(
             f"{ES_HOST}/wazuh-alerts/_search",
             data=data,
-            headers={"Content-Type": "application/json"},
+            headers=ES_HEADERS,
             method="POST"
         )
         with urllib.request.urlopen(req, timeout=10) as r:
@@ -221,7 +226,7 @@ def send_results_to_es(df, metrics, features_used):
         req = urllib.request.Request(
             f"{ES_HOST}/{index}/_doc",
             data=data,
-            headers={"Content-Type": "application/json"},
+            headers=ES_HEADERS,
             method="POST"
         )
         try:
@@ -241,7 +246,7 @@ def send_results_to_es(df, metrics, features_used):
     req = urllib.request.Request(
         f"{ES_HOST}/{index}/_doc",
         data=data,
-        headers={"Content-Type": "application/json"},
+        headers=ES_HEADERS,
         method="POST"
     )
     urllib.request.urlopen(req, timeout=5)
