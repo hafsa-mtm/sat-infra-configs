@@ -26,7 +26,7 @@ metricbeat.modules:
     period: 30s
 
 output.kafka:
-  hosts: ["192.168.87.132:9093"]
+  hosts: ["10.0.0.1:9093"]
   topic: "metrics"
   partition.round_robin:
     reachable_only: false

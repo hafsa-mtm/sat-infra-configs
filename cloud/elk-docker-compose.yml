@@ -17,6 +17,8 @@ services:
     image: logstash:8.13.0
     container_name: logstash
     network_mode: host
+    environment:
+      - xpack.monitoring.enabled=false
     volumes:
       - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
       - ./wazuh-logstash.conf:/usr/share/logstash/pipeline/wazuh-logstash.conf

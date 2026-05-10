@@ -14,7 +14,7 @@ filebeat.inputs:
       host: edge
 
 output.kafka:
-  hosts: ["192.168.87.132:9093"]
+  hosts: ["10.0.0.1:9093"]
   topic: "logs"
   partition.round_robin:
     reachable_only: false
