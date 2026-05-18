@@ -16,7 +16,7 @@ ES_PASS = "sat_elastic_2026"
 def fetch_metrics(size=1000):
     query = {
         "size": size,
-        "sort": [{"@timestamp": {"order": "asc"}}],
+        "sort": [{"@timestamp": {"order": "desc"}}],
         "query": {"match_all": {}},
         "_source": [
             "@timestamp",
