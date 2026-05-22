@@ -1,0 +1,11 @@
+# SAT Systems - Edge Monitoring Stack Variables
+kafka_host: "10.0.0.1"
+kafka_port: "9093"
+elasticsearch_host: "10.0.0.1"
+elasticsearch_port: "9200"
+elasticsearch_user: "elastic"
+elasticsearch_pass: "sat_elastic_2026"
+filebeat_version: "8.13.0"
+metricbeat_version: "8.13.0"
+edge_hostname: "edge"
+vpn_interface: "wg0"

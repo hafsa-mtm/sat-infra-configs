@@ -1,0 +1,40 @@
+# SAT Systems - Metricbeat Configuration
+# Managed by Ansible - DO NOT EDIT MANUALLY
+# Role: edge_monitoring
+
+name: "{{ edge_hostname }}"
+
+metricbeat.modules:
+  - module: system
+    metricsets:
+      - cpu
+      - memory
+      - network
+      - diskio
+      - process
+      - process_summary
+      - filesystem
+    period: 30s
+    processes: ['.*']
+    cpu.metrics: ["percentages"]
+    core.metrics: ["percentages"]
+
+  - module: docker
+    metricsets:
+      - container
+      - cpu
+      - diskio
+      - memory
+      - network
+    period: 30s
+    hosts: ["unix:///var/run/docker.sock"]
+
+output.kafka:
+  hosts: ["{{ kafka_host }}:{{ kafka_port }}"]
+  topic: "metrics"
+  partition.round_robin:
+    reachable_only: false
+  required_acks: 1
+  compression: gzip
+
+logging.level: info

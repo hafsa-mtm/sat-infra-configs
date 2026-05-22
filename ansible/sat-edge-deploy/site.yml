@@ -1,0 +1,38 @@
+---
+# SAT Systems - Edge Gateway Monitoring Deployment
+# Author: Hafsa Metmari
+# Description: Deploys Filebeat + Metricbeat on Edge node
+#              with Kafka output via WireGuard VPN tunnel
+
+- name: "SAT Systems | Deploy Edge Monitoring Stack"
+  hosts: edge_nodes
+  gather_facts: yes
+  become: no
+
+  pre_tasks:
+    - name: "Verify connectivity to Edge node"
+      ping:
+
+    - name: "Display Edge node information"
+      debug:
+        msg:
+          - "Hostname: {{ ansible_hostname }}"
+          - "OS: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+          - "IP: {{ ansible_default_ipv4.address }}"
+          - "Memory: {{ ansible_memtotal_mb }} MB"
+
+  roles:
+    - edge_monitoring
+
+  post_tasks:
+    - name: "SAT Systems | Deployment Summary"
+      debug:
+        msg:
+          - "========================================="
+          - "SAT Systems Edge Deployment Complete!"
+          - "========================================="
+          - "Node: {{ ansible_hostname }}"
+          - "Filebeat → Kafka ({{ kafka_host }}:{{ kafka_port }})"
+          - "Metricbeat → Kafka ({{ kafka_host }}:{{ kafka_port }})"
+          - "VPN tunnel: wg0 (10.0.0.0/24)"
+          - "========================================="

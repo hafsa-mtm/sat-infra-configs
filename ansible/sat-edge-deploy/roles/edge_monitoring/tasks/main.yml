@@ -1,0 +1,99 @@
+---
+- name: "SAT Systems | Check WireGuard VPN is active"
+  command: wg show wg0
+  register: vpn_status
+  changed_when: false
+  failed_when: vpn_status.rc != 0
+  become: yes
+
+- name: "SAT Systems | Display VPN status"
+  debug:
+    msg: "WireGuard VPN is active - proceeding with deployment"
+
+- name: "SAT Systems | Check Docker is running"
+  service:
+    name: docker
+    state: started
+  become: yes
+
+- name: "SAT Systems | Create Filebeat configuration directory"
+  file:
+    path: /home/edgevm/filebeat
+    state: directory
+    owner: edgevm
+    group: edgevm
+    mode: '0755'
+  become: yes
+
+- name: "SAT Systems | Create Metricbeat configuration directory"
+  file:
+    path: /home/edgevm/metricbeat
+    state: directory
+    owner: edgevm
+    group: edgevm
+    mode: '0755'
+  become: yes
+
+- name: "SAT Systems | Deploy Filebeat configuration"
+  template:
+    src: filebeat.yml.j2
+    dest: /home/edgevm/filebeat/filebeat.yml
+    owner: edgevm
+    group: edgevm
+    mode: '0644'
+  become: yes
+
+- name: "SAT Systems | Deploy Metricbeat configuration"
+  template:
+    src: metricbeat.yml.j2
+    dest: /home/edgevm/metricbeat/metricbeat.yml
+    owner: edgevm
+    group: edgevm
+    mode: '0644'
+  become: yes
+
+- name: "SAT Systems | Start Filebeat container"
+  community.docker.docker_container:
+    name: filebeat
+    image: "elastic/filebeat:{{ filebeat_version }}"
+    state: started
+    restart_policy: unless-stopped
+    user: root
+    volumes:
+      - /home/edgevm/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+  become: yes
+
+- name: "SAT Systems | Start Metricbeat container"
+  community.docker.docker_container:
+    name: metricbeat
+    image: "elastic/metricbeat:{{ metricbeat_version }}"
+    state: started
+    restart_policy: unless-stopped
+    user: root
+    volumes:
+      - /home/edgevm/metricbeat/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+      - /proc:/hostfs/proc:ro
+      - /:/hostfs:ro
+  become: yes
+
+- name: "SAT Systems | Verify Filebeat is running"
+  command: docker ps --filter name=filebeat --format '{% raw %}{{.Status}}{% endraw %}'
+  register: filebeat_status
+  changed_when: false
+
+- name: "SAT Systems | Verify Metricbeat is running"
+  command: docker ps --filter name=metricbeat --format '{% raw %}{{.Status}}{% endraw %}'
+  register: metricbeat_status
+  changed_when: false
+
+- name: "SAT Systems | Display deployment status"
+  debug:
+    msg:
+      - "Filebeat: {{ filebeat_status.stdout }}"
+      - "Metricbeat: {{ metricbeat_status.stdout }}"
+      - "Kafka endpoint: {{ kafka_host }}:{{ kafka_port }}"
+      - "Deployment complete!"

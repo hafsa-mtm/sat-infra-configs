@@ -1,0 +1,28 @@
+# SAT Systems - Filebeat Configuration
+# Managed by Ansible - DO NOT EDIT MANUALLY
+# Role: edge_monitoring
+
+name: "{{ edge_hostname }}"
+
+filebeat.inputs:
+  - type: container
+    paths:
+      - /var/lib/docker/containers/*/*.log
+    processors:
+      - add_docker_metadata:
+          host: "unix:///var/run/docker.sock"
+
+output.kafka:
+  hosts: ["{{ kafka_host }}:{{ kafka_port }}"]
+  topic: "logs"
+  partition.round_robin:
+    reachable_only: false
+  required_acks: 1
+  compression: gzip
+
+logging.level: info
+logging.to_files: true
+logging.files:
+  path: /var/log/filebeat
+  name: filebeat
+  keepfiles: 7
