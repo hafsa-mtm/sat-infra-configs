@@ -7,6 +7,10 @@
 ## VM Infrastructure
 - VM1 (Cloud): 192.168.87.132 - OpenStack + ELK + Wazuh + Kafka
 - VM2 (Edge): 192.168.87.131 - Docker + Filebeat + Metricbeat + Wazuh Agent + Prometheus
+  
+
+<img width="1403" height="747" alt="enddiagramwith animation (1)" src="https://github.com/user-attachments/assets/374e4309-93bf-43c1-a980-618d8a4defe5" />
+
 
 ## Structure
 - elk-docker-compose.yml       → ELK Stack deployment
