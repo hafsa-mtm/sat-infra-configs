@@ -1,12 +1,24 @@
-# SAT Systems Infrastructure Configurations
+# SAT — Secure AI-Enhanced Telemetry for Edge-Cloud IaaS Infrastructure
 
-## Project: Secure Automated Telemetry - Edge Cloud IaaS Platform
 ## Author: Hafsa Metmari
 ## Master PFE - 2026
 
+SAT is a unified Edge-Cloud observability and security platform that integrates six telemetry pipelines, three security enforcement layers, a multi-source AI anomaly detection engine, and a DevSecOps automation framework into a single operationally validated system.
 ## VM Infrastructure
 - VM1 (Cloud): 192.168.87.132 - OpenStack + ELK + Wazuh + Kafka
 - VM2 (Edge): 192.168.87.131 - Docker + Filebeat + Metricbeat + Wazuh Agent + Prometheus
+  VM2 (Edge Gateway — 192.168.87.131)          VM1 (Cloud Control Plane — 192.168.87.132)
+## Architecture Overview
+┌─────────────────────────────────┐           ┌──────────────────────────────────────────┐
+│  Filebeat      → logs           │  WireGuard │  Logstash   → Elasticsearch             │
+│  Metricbeat    → metrics        │────VPN─────│  Kibana     → dashboards                │
+│  Wazuh Agent   → security       │  ChaCha20  │  Wazuh Mgr  → SIEM alerts              │
+│  Prometheus    → scraping       │            │  Kafka      → message broker            │
+│  Node Exporter → system metrics │            │  Grafana    → real-time monitoring      │
+│  cAdvisor      → containers     │            │  OpenStack  → IaaS platform             │
+└─────────────────────────────────┘           │  AI Pipeline→ Isolation Forest          │
+                                               └──────────────────────────────────────────┘
+
 ## End-to-End Telemetry and Security Data Flow
 <img width="1403" height="747" alt="enddiagramwith animation (1)" src="https://github.com/user-attachments/assets/374e4309-93bf-43c1-a980-618d8a4defe5" />
 
