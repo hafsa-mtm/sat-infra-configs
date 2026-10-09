@@ -154,9 +154,68 @@ python3 ai/anomaly_detection.py
 # Results are indexed into anomaly-scores-v2 index in Elasticsearch
 # View results in Kibana → AI Anomaly Detection dashboard
 ```
-## Structure
-- elk-docker-compose.yml       → ELK Stack deployment
-- logstash.conf                → Logstash pipeline config
-- wazuh-docker-compose.yml     → Wazuh Manager deployment
-- kafka-docker-compose.yml     → Kafka + Zookeeper deployment
-- kolla-globals.yml            → OpenStack Kolla-Ansible config
+## Key Results
+
+| Metric | Value |
+|--------|-------|
+| Total documents indexed | 252,348 |
+| Evaluation period | 10 days continuous |
+| Pipeline failures | 0 |
+| VPN packet loss | 0% |
+| VPN latency | < 2ms RTT |
+| AI Recall | 100% |
+| AI Accuracy | 92.5% |
+| Edge RAM utilization | 7.9% |
+| Ansible tasks executed | 393 (0 failures) |
+| Security alerts | 1,451 |
+| MITRE ATT&CK techniques detected | 3 (T1040, T1110, T1548) |
+## Verification Commands
+
+```bash
+# Check all Edge containers running
+docker ps
+
+# Check Elasticsearch indices
+curl -u elastic:sat_elastic_2026 http://VM1_IP:9200/_cat/indices?v
+
+# Check WireGuard tunnel
+sudo wg show
+
+# Check Wazuh agent status (VM2)
+sudo systemctl status wazuh-agent
+
+# Check Prometheus targets
+curl http://localhost:9090/api/v1/targets
+```
+## Repository Structure
+
+```
+sat-infra-configs/
+├── cloud/
+│   ├── elk-docker-compose.yml        # ELK Stack deployment
+│   ├── logstash.conf                 # Logstash pipeline config
+│   ├── wazuh-docker-compose.yml      # Wazuh Manager deployment
+│   ├── wazuh-logstash.conf           # Wazuh → Logstash pipeline
+│   ├── wazuh-to-es.py                # Wazuh alert ingestion script
+│   ├── kafka-docker-compose.yml      # Kafka + ZooKeeper deployment
+│   └── kolla-globals.yml             # OpenStack Kolla-Ansible config
+├── edge/
+│   ├── filebeat.yml                  # Filebeat log collection config
+│   ├── metricbeat.yml                # Metricbeat metrics config
+│   ├── prometheus.yml                # Prometheus scraping config
+│   ├── filebeat-docker-compose.yml   # Filebeat container
+│   ├── metricbeat-docker-compose.yml # Metricbeat container
+│   └── services-docker-compose.yml   # Edge workload services
+├── ansible/
+│   └── sat-edge-deploy/
+│       ├── site.yml                  # Main Ansible playbook
+│       ├── inventory.ini             # Host inventory
+│       └── roles/edge_monitoring/    # Custom Ansible role (16 tasks)
+├── ai/
+│   ├── compute_metrics_v3.py         # Feature extraction
+│   └── anomaly_detection.py          # Isolation Forest pipeline
+└── vpn/
+    ├── vm1-wg0.conf.txt              # WireGuard config VM1
+    └── vm2-wg0.conf.txt              # WireGuard config VM2
+```
+
